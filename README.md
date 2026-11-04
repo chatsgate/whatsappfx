@@ -1,21 +1,147 @@
-# WhatsappFx — WhatsApp for agentic workflows
+<p align="center">
+  <img src="ui/icons/png/whatsappfx-256.png" width="128" alt="WhatsappFx logo">
+</p>
 
-Records WhatsApp messages into a local journal and index, files attachments into a folder of your choice by
-per-chat policy, and exposes the lot to AI coding agents through a command line.
+<h1 align="center">WhatsappFx</h1>
 
-Two processes. `wa-connector.exe` is Go and speaks WhatsApp (via [whatsmeow]) and nothing else;
-`whatsappfx.exe` is Java and holds the index, the policy, the window and the write gate. They talk
-NDJSON over a pipe. The split is deliberate: a crash in the protocol stack is a restart of a child,
-not a dead JVM with the database open.
+<p align="center"><b>WhatsApp on your desktop, the way you wish it was.</b><br>
+Many numbers, each in its own colour and its own window. A fraction of the memory. Your messages kept on your own disk. And a command line your AI agents can use, with you holding the key.</p>
+
+<p align="center">
+  <img src="docs/screenshots/chats-personal.png" width="100%" alt="WhatsappFx with the green Personal number open on a chat that has a picture in it">
+</p>
+
+<p align="center"><i>All people, numbers and messages in the screenshots are invented.</i></p>
+
+> **Please read before you link a number.** WhatsappFx is an independent open-source project. It is **not affiliated with, endorsed by or connected to WhatsApp or Meta**; "WhatsApp" is their trademark. It is an *unofficial* client: it joins your account as a linked device through [whatsmeow], a reverse-engineered implementation of the WhatsApp protocol, not through any API WhatsApp offers. **Using an unofficial client is against WhatsApp's terms and your number can be restricted or banned for it.** Use it with a number you can afford to lose, link only accounts that are yours, keep your activity human (never bulk, never unsolicited, never fast loops of messages), and treat every automation you connect as a way to get banned if it misbehaves. Read *Staying on the right side of WhatsApp* below.
+
+## Why this exists
+
+Three reasons, in this order:
+
+1. **Agentic command-line access.** We wanted AI agents, the "Claude, but it can read and answer my WhatsApp" kind, to be able to speak with people and work from conversations, without handing the agent the keys to everything. WhatsappFx gives them a command line (`whatsappcli`) and gives *you* a window that decides, for each program and each number, what is allowed.
+2. **Saving RAM.** The official desktop app is a browser in disguise and keeps hundreds of megabytes busy even when you are not looking at it. WhatsappFx gives its memory back when its window is closed.
+3. **Keeping more than two numbers straight.** Work, personal, the shop, the club. With several WhatsApps it is far too easy to answer from the wrong one. Here every number has its own colour, name and window, and a key to jump between them.
+
+## What you get
+
+**One app, all your numbers, each with its own colour.** Link up to eight numbers, the way people keep several email accounts. Every number gets its own window, name and colour, and the colour runs all the way through: title bar, buttons, your bubbles, notification cards, the taskbar icon and the approval window. You always know which number you are typing as. **F4** jumps to the next number.
+
+<p align="center">
+  <img src="docs/screenshots/chats-studio.png" width="49%" alt="The violet Studio number">
+  <img src="docs/screenshots/chats-family.png" width="49%" alt="The amber Family number">
+</p>
+
+**Pictures, videos, files, voice notes: you see them.** A photo shows as a thumbnail the moment it arrives, and one you send appears at once. Anything else (a PDF, a voice note) is a card with its name and size. Click to open: if the file is not on your machine yet it is downloaded into the folder you chose, then opened. Paste a screenshot with Ctrl+V (Cmd+V on a Mac), drop files on the chat, or press **F6**; a preview shows what will go, Enter sends, Esc cancels. Calls cannot be answered here, so their buttons are struck through rather than pretending.
+
+**Notifications that match.** A new message appears as a clean, solid card in the colour of the number it came to, so you know which inbox to answer without reading a word.
+
+<p align="center">
+  <img src="docs/screenshots/notification.png" width="420" alt="A notification card in the colour of its number">
+</p>
+
+**Keyboard first.** Every window is driven by the function keys, shown on a one-row bar at the bottom (F1 settings, F2 search, F3 write, F4 next number, F6 attach, Esc back). Every key is also a button for the mouse. Built for people whose hands get tired.
+
+**Your messages stay yours.** Everything is kept in a plain journal on your own disk, one file per chat, with a search index you can rebuild from it. The WhatsApp session is encrypted with a key only your user account can open (Windows data protection, the macOS Keychain), and one recovery code, shown once, restores it.
+
+**Linking is a QR code away.** Scan it from the phone, or type the number and use a pairing code.
+
+<p align="center">
+  <img src="docs/screenshots/link-qr.png" width="70%" alt="Linking a number: scan the QR from the phone">
+</p>
+
+## Memory: the point of it
+
+Measured on one Windows 11 PC, working set in MB (what Task Manager shows), after the apps had settled for a few minutes. The official app is the Microsoft Store WhatsApp, summed over its whole process tree because it is a browser engine (one WebView2 process per job). WhatsappFx is the app plus its connector processes.
+
+<p align="center">
+  <img src="docs/screenshots/memory.png" width="90%" alt="Bar chart: official WhatsApp about 900 to 1100 MB; WhatsappFx with one number and with three numbers a fraction of that">
+</p>
+
+| | window open | window closed or minimised |
+|---|---|---|
+| WhatsApp, the official app (one number) | 1082 MB (8 processes) | 880 MB (7 processes) |
+| WhatsappFx, one number | about 340 MB | 134 MB |
+| WhatsappFx, three numbers | 438 MB (three windows) | 270 MB |
+
+The invented three-number setup used for the screenshots was not linked to real accounts; the one-number rows are a real linked number. In this measurement each extra number cost about 75 MB for its connector process, and the Java side grew by only a few MB.
+
+**Why more numbers cost so little.** All the numbers run in the *same* process. They share one Java virtual machine and its classes, one garbage-collected heap, one code cache, one window toolkit, one ArcadeDB index and one local web server. Adding a number adds a small connector (the part that speaks the WhatsApp protocol, roughly 75 MB here) and a few megabytes of data structures; it does not add another app. You can add several. The rise when a window opens and the fall when it closes are bigger the more numbers you have, because the window code and its images are the part that is given back: the app trims itself two minutes after the last window closes, and a periodic full collection returns heap to the operating system.
+
+These are numbers from one machine, measured once; your machine will differ. The method is in the commit that added this section and in `docs/screenshots/Seed.java`, which builds the invented three-number setup used for the screenshots.
+
+## For agents and scripts
+
+`whatsappcli` is a real command line for scripts and AI agents: every verb prints TSV or `--json`, long jobs return a job id, and every verb has `--help`.
+
+    whatsappcli accounts                                    # the linked numbers
+    whatsappcli --account studio chats --contains harbor     # find a chat
+    whatsappcli --account studio messages --chat <jid>       # read it (asks you first)
+    whatsappcli --account studio search "invoice"            # full-text search across chats
+    whatsappcli --account studio send --chat <jid> --text "On my way"   # asks you again
+    whatsappcli --account studio send --chat <jid> --file proof.pdf     # a document, or a picture as a picture
+    whatsappcli --account studio send --chat <jid> --text "..." --draft # sends nothing: puts a link in your own chat
+
+With several numbers every command names one (`--account` takes the short name, the name you gave it, or the last digits of the phone number); without it the command is refused and told what exists, so an agent can never answer from the wrong number by accident. It also reads (chats, contacts, messages, search, read-only SQL over the index), replies, edits, deletes, reacts, stars, downloads attachments, rejects calls and manages numbers. [The full reference is below.](#the-command-line)
+
+### The lease: a lot of power, with enough safety
+
+WhatsappFx uses the *lease* idea of [leasegate](https://github.com/leasegate), the small gates that sit between agents and the things they should not hold for ever. An agent never gets standing power. It gets a **lease**, granted by you, for one thing, on one number, for a short time:
+
+- **Every program is named.** The first command a program runs makes the app show a window naming that program, the programs above it (the terminal, the agent) and exactly what it asks. The caller is identified by the operating system's own socket table, not by anything the program claims.
+- **You decide with one key.** F2 approves, Esc refuses; the command waits for your answer.
+- **Four tiers, smallest first.** LIST (names of chats and contacts), READ (messages), SEND (to one chat) and CONTROL (stop the app, link, unlink, change policy). A lease for reading one chat does not read another.
+- **Leases end by themselves.** When the program closes, or on a timer (sending to one person: 30 minutes and 20 messages; to yourself, 4 hours; reading one chat 4 hours, every chat 1 hour). `whatsappcli lock` revokes all of them at once.
+- **A group is a different question.** Sending to a group, channel or broadcast list is approved separately, in plainer words, because many people read it. `--draft` lets an agent prepare a message and leaves the sending to your own hand.
+- **Nothing is hidden.** Every allowed request is one line in `run/access.log` (never the message text), and every send, edit and delete raises a notice. A lease is for one number, so using a second number asks again.
+- **The key stays with you.** The agent never sees the session key or the recovery code, and it cannot approve itself: the approval is a window on your screen, not a flag.
+
+A deliberate switch exists for people who want it quiet, *wallet open*, which skips the window for up to four hours; it is logged and announced and it is yours to turn on, not the agent's.
+
+## Staying on the right side of WhatsApp
+
+WhatsApp does not allow unofficial clients and can restrict or ban numbers that use them. WhatsappFx tries to behave like a quiet linked device, but no software can promise you will not be banned. Please:
+
+- use it with numbers you can afford to lose; do not link the one number your business or your family depends on;
+- keep a person in the loop: let agents *prepare* messages (`--draft`) and send them yourself for anything that matters;
+- never send bulk, repeated or unsolicited messages, never message people who have not asked to hear from you, and keep automated replies slow and rare;
+- do not script rapid loops of sends, joins or group actions; a lease caps how many messages a program may send (20 per half hour to one person), so do not look for ways round it;
+- leave the app running (it keeps the link alive); a computer that stays off for about two weeks is unlinked by WhatsApp.
+
+## Get it
+
+**Windows.** Build it (JDK 25, Go 1.26+): `mvn install` for the app and `cd connector && go build -o wa-connector.exe .`; copy the connector to `%USERPROFILE%\chatsgate\whatsappfx\bin\`, then `java --enable-native-access=ALL-UNNAMED -jar ui\target\whatsappfx.jar`. A ready-to-run archive will be attached to a release.
+
+**macOS (Apple silicon).** From the [Releases](../../releases) page download `whatsappfx-mac.tar.gz` and, in Terminal, with Java 25 installed (a JDK from [adoptium.net](https://adoptium.net) is fine):
+
+    tar -xzf whatsappfx-mac.tar.gz && sh whatsappfx-mac/install.sh
+    ~/.local/bin/whatsappfx --background
+
+Download with `curl -fLO`, not a browser, so macOS does not put its quarantine flag on the files. The F-keys are media keys on a Mac laptop: hold **Fn**, or tick "Use F1, F2, etc. keys as standard function keys" in System Settings, Keyboard.
+
+> **Mac testing is poor, and we say so.** The Mac build has been tested on a CI runner (GitHub's Apple-silicon machines: it starts, the windows open, the command line is identified, two numbers run, screenshots are taken) and then **once on one person's real MacBook, where it did not go smoothly**: it is not a proper Mac app yet (it appears as "java" in the Dock and menu bar, there is no `.app` bundle, it needs Java installed by hand), windows may open behind others or on another desktop until you click its Dock icon, and it is not signed or notarised. Treat the Mac version as a preview, expect rough edges, and please open an issue with what you see. A real `.app` is next.
+
+**Add another number** at any time: Settings, This number, **F4** (or General, **F6**), or `whatsappcli account-add --title "Shop"`. A new window opens with a QR for that phone.
+
+## Credits and licences
+
+- **[whatsmeow](https://github.com/tulir/whatsmeow)** by Tulir Asokan and contributors: the Go library that speaks the WhatsApp Web multi-device protocol. Without it this project would not exist. Our connector is built on it (and, through it, on the Signal protocol library), which is why the connector is GPL-3.0.
+- **WhatsApp** and its design are the work of WhatsApp LLC / Meta. The look here is our own interpretation; WhatsApp's own artwork, icon font and sounds are not copied or shipped.
+- **[leasegate](https://github.com/leasegate)** for the approval windows, window frame and the lease idea.
+- ArcadeDB for the index, JavaFX for the windows, picocli for the command line, Material Design icons (Apache-2.0) and Roboto (Apache-2.0).
+- The app is Apache-2.0; the connector is GPL-3.0. See *Licence* below.
+
+WhatsappFx is **not affiliated with, authorised by or endorsed by WhatsApp, Meta, or the whatsmeow authors**. Product names belong to their owners and are used only to say what this works with.
+
+---
+
+# Reference
+
+## Under the hood
+
+Two processes. `wa-connector` is Go and speaks WhatsApp (via [whatsmeow]) and nothing else; `whatsappfx` is Java and holds the index, the policy, the windows and the write gate. They talk NDJSON over a pipe. The split is deliberate: a crash in the protocol stack is a restart of a child, not a dead JVM with the database open.
 
 [whatsmeow]: https://github.com/tulir/whatsmeow
-
-> **Read this before you link your number.** whatsappfx is an independent project, not affiliated with WhatsApp or
-> Meta; "WhatsApp" is their trademark. It is an *unofficial* client: it joins your account as a linked device through
-> whatsmeow, a reverse-engineered implementation of the WhatsApp protocol, not through any API WhatsApp offers. Using
-> an unofficial client is against WhatsApp's terms, and WhatsApp can restrict or ban an account that uses one. Use it
-> with a number you can afford to lose, and do not use it to send bulk or automated messages to people who did not
-> ask for them: that is the behaviour bans are made for.
 
 ## Running it
 
@@ -25,15 +151,15 @@ in the tray; Esc hides the window, the tray icon brings it back.
 First run, pair the device: type the phone number in full international form and press **F2** for a
 pairing code, or **F3** for a QR. On the phone: Linked Devices, Link a Device.
 
-**F10** forgets the linked device, so this machine can be paired again. It takes two presses within five
-seconds, because it ends a link only the phone can restore. The involuntary case needs nothing from anybody:
+**F10** forgets the linked device, so this machine can be paired again. It first asks, naming the number, its colour and its window title (focus starts on Cancel), because it ends a link only the phone can restore. The involuntary case needs nothing from anybody:
 see *When the link breaks* below.
 
 ## Several numbers
 
+
 One WhatsappFx holds several phone numbers, each like another e-mail account: its own window, its own name and colour, its own
 linked device, journal and files, and one tray icon for all. Settings (F1), section "This number": **F2** names it, **F3** or a
-click on a swatch gives it one of eight colours (no two numbers share one), **F4** adds another number, **F10** (twice) takes one off
+click on a swatch gives it one of eight colours (no two numbers share one), **F4** adds another number, **F10** takes one off
 the list; its messages and files stay on disk. A new number opens its Link window, and is linked from that phone like the first.
 
 The window of a number wears its colour on its accent, its outgoing bubbles, its title bar and edge, and its taskbar icon (the icon
@@ -48,8 +174,7 @@ access log names the number on every line. A chat id and a message id belong to 
 There is ONE session key per PC, not one per number: each number has its own encrypted session store under `accounts<key>session`,
 and the one recovery code (`whatsappcli key --recovery-code`) restores the key of all of them. Adding a number makes no new code.
 
-Each number runs its own small connector process (about 25 MB working set, 55 MB private, while idle and not yet linked; a linked
-one holds more) and shares the one index, so memory grows by that, not by a second app.
+Each number runs its own small connector process (about 75 MB working set in the measurement above) and shares the one index, so memory grows by that, not by a second app.
 
 ## The command line
 
@@ -277,7 +402,7 @@ connector to `~\chatsgate\whatsappfx\bin\` after building it.
 
 ## On a Mac
 
-**Status, said plainly: it runs on a real Apple-silicon Mac (macOS 14, a CI runner), not yet on a person's own Mac.** On every manual run of the
+**Status, said plainly: Mac testing is poor.** It runs on GitHub's Apple-silicon CI runner (macOS 14) and was installed once on a real MacBook (macOS 26), where windows did not come to the front by themselves. It is a preview. On every manual run of the
 "Mac" workflow (Actions tab) GitHub's Apple-silicon runner builds the connector and the app, starts the app on a scratch home, and checks:
 the app starts and stays up, two numbers each get their own connector process, `whatsappcli` is identified by the real caller check (the
 kernel's socket table) so `status` works, a command without `--account` is refused with several numbers, the chats, Settings and Link (QR)
