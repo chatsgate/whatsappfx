@@ -44,6 +44,12 @@ Three reasons, in this order:
 
 **Your messages stay yours.** Everything is kept in a plain journal on your own disk, one file per chat, with a search index you can rebuild from it. The WhatsApp session is encrypted with a key only your user account can open (Windows data protection, the macOS Keychain), and one recovery code, shown once, restores it.
 
+**One recovery code, shown once.** The first time the app starts it creates the key that protects your session and shows its recovery code for you to write down. It is the only way to restore the session on another machine.
+
+<p align="center">
+  <img src="docs/screenshots/recovery-code.png" width="420" alt="The first-start window showing the recovery code">
+</p>
+
 **Linking is a QR code away.** Scan it from the phone, or type the number and use a pairing code.
 
 <p align="center">
@@ -95,6 +101,13 @@ WhatsappFx uses the *lease* idea of [leasegate](https://github.com/leasegate), t
 - **A group is a different question.** Sending to a group, channel or broadcast list is approved separately, in plainer words, because many people read it. `--draft` lets an agent prepare a message and leaves the sending to your own hand.
 - **Nothing is hidden.** Every allowed request is one line in `run/access.log` (never the message text), and every send, edit and delete raises a notice. A lease is for one number, so using a second number asks again.
 - **The key stays with you.** The agent never sees the session key or the recovery code, and it cannot approve itself: the approval is a window on your screen, not a flag.
+
+<p align="center">
+  <img src="docs/screenshots/approval-read.png" width="32%" alt="Approval window, violet number: a program asks to read messages in one chat">
+  <img src="docs/screenshots/approval-send.png" width="32%" alt="Approval window, green number: a program asks to send in one chat, at most 20 messages">
+  <img src="docs/screenshots/approval-group.png" width="32%" alt="Approval window, amber number: a program asks to send to a group, in red, because many people see it">
+</p>
+<p align="center"><i>The approval window, in the colour of the number it is about. Left: read one chat. Middle: send to one person (at most 20 messages, then it asks again). Right: send to a group, said in red because everyone in it sees it. Pick how far up the process tree the lease reaches and for how long; F2 approves, Esc denies.</i></p>
 
 A deliberate switch exists for people who want it quiet, *wallet open*, which skips the window for up to four hours; it is logged and announced and it is yours to turn on, not the agent's.
 
@@ -313,15 +326,22 @@ An unencrypted session store from before this version is converted on the first 
 
 ## Reading the index directly
 
-The listing verbs are built on SQL rather than on the typed query builder, and that is not a style
-choice. ArcadeDB's native `Select` — which the builder uses — hands the result limit to the index
-candidate scan, so the cap is spent before the remaining conditions and before the ordering. Measured
-here: `messages --chat` returned 0 rows of 371, `search "the"` returned 11 of 662, and `chats`
-reported a last-message timestamp ten days stale. The same questions in SQL answer correctly. Filed
-upstream as ArcadeData/arcadedb#6565.
+The listing verbs are built on SQL, and the limit is applied in Java on the way out, never inside the
+statement. That began in August 2026, when ArcadeDB's native `Select` (which the typed query builder
+uses) handed the result limit to the index candidate scan, so the cap was spent before the other
+conditions and the ordering: `messages --chat` returned 0 rows of 371, `search "the"` returned 11 of
+662, and `chats` reported a last-message timestamp ten days stale. It was filed as
+[ArcadeData/arcadedb#6565](https://github.com/ArcadeData/arcadedb/issues/6565) and **closed as fixed on
+2026-08-22**; the first release with the fix is 26.9.1 (this project is on 26.7.3 and has not moved).
 
-So if you extend this, ask the index in SQL and bound the result in Java. A limit inside the
-statement puts the cap back where the engine can misuse it.
+Re-measured on 2026-11-04 on a copy of a real index (21,736 messages, 798 chats), counts only: the
+typed builder now returns the same as SQL for paging (`limit`, `skip`), for the newest timestamp of a
+chat, for `IS NOT NULL` without a limit, and for the `ilike` search, on ArcadeDB 26.7.3 and on 26.10.2,
+with `datapotter-arcadedbhelper` 1.7. That helper also refuses `IS NULL` / `IS NOT NULL` combined with a
+limit or skip instead of silently returning fewer rows. So the SQL path is no longer a workaround for a
+live engine bug; it stays because it is written and tested that way, and moving the listing verbs back
+to the builder is a cleanup, not a fix. If you extend this, either path is fine, but keep the limit
+out of an SQL statement and bound the result in Java.
 
 The index is opened embedded, through `DatabaseFactory`. It used to be an `ArcadeDBServer`, which
 nothing here ever queried over the wire and which cost two listening sockets — an HTTP one from

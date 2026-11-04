@@ -11,15 +11,15 @@ import java.util.Map;
 /**
  * Read-only SQL against the index, and the only read path this daemon trusts.
  *
- * <p>ArcadeDB has two query APIs and they disagree. The typed builder goes through the engine's
- * native {@code Select}, which hands the result limit to the index candidate scan — so the cap is
- * spent before the remaining conditions and before the ordering are applied. Measured on this index:
- * {@code messages --chat} returned 0 rows of 371, {@code search "the"} returned 11 of 662, and
- * {@code chats} reported a last-message timestamp ten days stale on a busy chat. The same questions
- * asked in SQL answer correctly, so every listing verb is built here.
+ * <p>Why SQL and not the typed builder: in August 2026 the engine's native {@code Select} handed the result
+ * limit to the index candidate scan, so the cap was spent before the other conditions and the ordering
+ * ({@code messages --chat} returned 0 of 371 rows, {@code search "the"} 11 of 662, {@code chats} a stale
+ * timestamp). That was ArcadeData/arcadedb#6565, closed as fixed on 2026-08-22 (first release 26.9.1), and on
+ * 2026-11-04 the builder matched SQL on a copy of a real index on 26.7.3 and on 26.10.2. SQL stays because it
+ * is written and tested that way, not because of a live engine bug.
  *
- * <p>The limit is therefore applied in Java, on the way out, and never inside the statement: a
- * {@code LIMIT} in the SQL text would put the cap back where the engine can misuse it.
+ * <p>The limit is applied in Java, on the way out, and never inside the statement: keeping the cap out of
+ * the SQL text is simpler to reason about, whichever engine version is underneath.
  */
 public final class Sql {
 
