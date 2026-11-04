@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.chatsgate</groupId>
+    <artifactId>whatsappfx-parent</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+
+    <description>Parent POM for whatsappfx: wire DTOs, journal and index core, daemon, agent CLI and
+        the desktop UI. The WhatsApp protocol itself lives in the Go connector under connector/,
+        built separately and driven as a child process.</description>
+
+    <properties>
+        <!-- The jars the cmdtools launchers run. Default: this build's own. A LIVE install passes -Dwa.ui.jar and -Dwa.cli.jar pointing at copies in
+             their own folder, so a later build here never changes the jars under a running app: see README, Installing. -->
+        <wa.ui.jar>${project.build.directory}/whatsappfx.jar</wa.ui.jar>
+        <wa.cli.jar>${project.build.directory}/whatsappcli.jar</wa.cli.jar>
+        <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <arcadedb.ver>26.7.3</arcadedb.ver>
+        <datahelper.ver>1.7</datahelper.ver>
+        <datahelper.processor.ver>1.3</datahelper.processor.ver>
+
+        <!-- ArcadeDB 26.x calls com.google.gson.Strictness, absent before 2.11. -->
+        <gson.ver>2.14.0</gson.ver>
+        <javalin.ver>6.3.0</javalin.ver>
+        <picocli.ver>4.7.7</picocli.ver>
+        <jackson.ver>2.21.2</jackson.ver>
+        <javafx.ver>25.0.2</javafx.ver>
+
+        <compiler.plugin.ver>3.13.0</compiler.plugin.ver>
+        <shade.plugin.ver>3.5.1</shade.plugin.ver>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${compiler.plugin.ver}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${shade.plugin.ver}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <modules>
+        <module>wire</module>
+        <module>core</module>
+        <module>daemon</module>
+        <module>cli</module>
+        <module>ui</module>
+        
+        
+    </modules>
+</project>

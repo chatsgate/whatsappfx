@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.chatsgate</groupId>
+        <artifactId>whatsappfx-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>whatsappfx-ui</artifactId>
+    <packaging>jar</packaging>
+
+    <description>whatsappfx: the tray app. Hosts the daemon in-process, pairs the device, shows how
+        long since WhatsApp last heard from us, and asks a person to approve each program that uses whatsappcli.</description>
+
+    <properties>
+        <main.class>chatsgate.whatsappfx.ui.App</main.class>
+        <!-- JavaFX ships prebuilt native bundles per OS/arch on Maven Central; the classifier picks
+             which one gets shaded in. Override with -Djavafx.classifier=mac-aarch64 (or mac, linux,
+             linux-aarch64) to build for a different target — Maven just downloads the artifact, so
+             this works from any build machine regardless of its own OS. -->
+        <javafx.classifier>win</javafx.classifier>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <!-- tray notifications headed "whatsappfx" with its icon; built locally from littlejlib/traynotify, not on Maven Central yet -->
+            <groupId>io.github.littlejlib</groupId>
+            <artifactId>littlejlib-traynotify</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.chatsgate</groupId>
+            <artifactId>whatsappfx-daemon</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.leasegate</groupId>
+            <artifactId>leasegate-core</artifactId>
+            <version>0.3.1</version>
+        </dependency>
+        <!-- The gates' window frame, F-key chips, icons and JavaFX-drawn tray menu, so whatsappfx looks like its siblings -->
+        <dependency>
+            <groupId>io.github.leasegate</groupId>
+            <artifactId>leasegate-frame</artifactId>
+            <version>0.3.1</version>
+            <exclusions>
+                <!-- the JavaFX natives of this build are the ones declared below, whatever OS this leasegate was built on -->
+                <exclusion><groupId>org.openjfx</groupId><artifactId>*</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.github.leasegate</groupId>
+            <artifactId>leasegate-tray</artifactId>
+            <version>0.3.1</version>
+            <exclusions>
+                <!-- the JavaFX natives of this build are the ones declared below, whatever OS this leasegate was built on -->
+                <exclusion><groupId>org.openjfx</groupId><artifactId>*</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <!-- the approval window (F2 / Esc) and the list of approvals, the same windows the gates use -->
+        <dependency>
+            <groupId>io.github.leasegate</groupId>
+            <artifactId>leasegate-ui</artifactId>
+            <version>0.3.1</version>
+            <exclusions>
+                <!-- the JavaFX natives of this build are the ones declared below, whatever OS this leasegate was built on -->
+                <exclusion><groupId>org.openjfx</groupId><artifactId>*</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- The classifier carries the natives as well as the classes; the plain artifact alone
+             cannot run from a shaded jar. -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.ver}</version>
+            <classifier>${javafx.classifier}</classifier>
+            <exclusions>
+                <!-- the pom of a JavaFX jar names its dependencies without a classifier, which Maven fills with the BUILD machine's OS: a Mac jar built on Windows would carry the Windows natives too -->
+                <exclusion><groupId>org.openjfx</groupId><artifactId>*</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.ver}</version>
+            <classifier>${javafx.classifier}</classifier>
+            <exclusions>
+                <!-- the pom of a JavaFX jar names its dependencies without a classifier, which Maven fills with the BUILD machine's OS: a Mac jar built on Windows would carry the Windows natives too -->
+                <exclusion><groupId>org.openjfx</groupId><artifactId>*</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.ver}</version>
+            <classifier>${javafx.classifier}</classifier>
+            <exclusions>
+                <!-- the pom of a JavaFX jar names its dependencies without a classifier, which Maven fills with the BUILD machine's OS: a Mac jar built on Windows would carry the Windows natives too -->
+                <exclusion><groupId>org.openjfx</groupId><artifactId>*</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>whatsappfx</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>chatsgate.whatsappfx.ui.Launcher</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- The cmdtools launcher(s), built by jr-maven-plugin with the config baked in (replaces the .jrc):
+         mvn -Djrexe -Djr.installDir=<folder on PATH> package -->
+    <profiles>
+        <profile>
+            <id>jrexe</id>
+            <activation>
+                <property>
+                    <name>jrexe</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.jarrunner</groupId>
+                        <artifactId>jr-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>whatsappfx</id>
+                                <goals><goal>exe</goal></goals>
+                                <configuration>
+                                    <name>whatsappfx</name>
+                                    <jar>${wa.ui.jar}</jar>
+                                    <jvmMode>dll</jvmMode>
+                                    <aot>true</aot>
+                                    <icon>${project.basedir}/src/main/jr/whatsappfx.ico</icon>
+                                    <vmArgs><vmArg>-Xms16m</vmArg><vmArg>-Xmx384m</vmArg><vmArg>-Xss512k</vmArg><vmArg>-XX:+UseG1GC</vmArg><vmArg>-XX:ParallelGCThreads=2</vmArg><vmArg>-XX:ConcGCThreads=1</vmArg><vmArg>-XX:MarkStackSize=64K</vmArg><vmArg>-XX:MinHeapFreeRatio=10</vmArg><vmArg>-XX:MaxHeapFreeRatio=30</vmArg><vmArg>-XX:MaxNewSize=48m</vmArg><vmArg>-XX:MaxMetaspaceSize=128m</vmArg><vmArg>-XX:ReservedCodeCacheSize=48m</vmArg><vmArg>-XX:MaxDirectMemorySize=64m</vmArg><vmArg>--enable-native-access=ALL-UNNAMED</vmArg></vmArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

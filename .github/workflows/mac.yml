@@ -1,0 +1,45 @@
+# Runs the app on a real Apple-silicon Mac. Manual only (one runner, few minutes): Actions > "Mac" > Run workflow.
+name: Mac
+on: workflow_dispatch
+jobs:
+  mac:
+    runs-on: macos-14
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '25' }
+      - uses: actions/setup-go@v5
+        with: { go-version-file: connector/go.mod, cache-dependency-path: connector/go.sum }
+      - name: "Build the connector (darwin/arm64) and the app (macOS JavaFX natives)"
+        run: |
+          (cd connector && CGO_ENABLED=0 go build -trimpath -o wa-connector .)
+          file connector/wa-connector
+          mvn -B -q -DskipTests -Djavafx.classifier=mac-aarch64 package
+          ls -la ui/target/whatsappfx.jar cli/target/whatsappcli.jar
+      - name: "Gate and number harnesses (the real caller check on macOS)"
+        timeout-minutes: 20
+        run: |
+          set +e; FAIL=0; mkdir -p ci-out
+          for h in gatecheck-12 accountscheck-13; do
+            H="$RUNNER_TEMP/h-$h"; rm -rf "$H"; mkdir -p "$H/bin"; cp connector/wa-connector "$H/bin/"
+            WHATSAPPFX_HOME="$H" java --enable-native-access=ALL-UNNAMED -cp daemon/target/whatsappfx-daemon-1.0.jar ci/$h.java > "ci-out/$h.log" 2>&1
+            grep -E "^(FAIL|ALL OK|[0-9]+ FAILED)" "ci-out/$h.log" | head -20; tail -1 "ci-out/$h.log" | grep -q "ALL OK" || FAIL=1
+          done
+          exit $FAIL
+      - name: "Smoke test - start the app, windows, notification, CLI, screenshots"
+        if: always()
+        timeout-minutes: 10
+        run: bash ci/mac-smoke.sh
+      - name: "Pack the Mac download (app, command line, connector, install.sh)"
+        run: bash ci/package-mac.sh ci-out/dist
+      - uses: actions/upload-artifact@v4
+        with: { name: whatsappfx-mac, path: ci-out/dist/, retention-days: 14 }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-results
+          path: |
+            ci-out/
+            !ci-out/dist/
+          retention-days: 7

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.chatsgate</groupId>
+        <artifactId>whatsappfx-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>whatsappfx-core</artifactId>
+    <packaging>jar</packaging>
+
+    <description>Journal, index model and schema, connector supervision, attachment policy and
+        placement. Everything that knows about ArcadeDB or about the child process.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.chatsgate</groupId>
+            <artifactId>whatsappfx-wire</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.arcadedb</groupId>
+            <artifactId>arcadedb-engine</artifactId>
+            <version>${arcadedb.ver}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.arcadedb</groupId>
+            <artifactId>arcadedb-server</artifactId>
+            <version>${arcadedb.ver}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.datapotter</groupId>
+            <artifactId>datapotter-arcadedbhelper</artifactId>
+            <version>${datahelper.ver}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-toml</artifactId>
+            <version>${jackson.ver}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+              Two passes, and neither is optional. JDK 23 stopped running annotation processing
+              implicitly, and even with it enabled a single pass fails: classes outside the model
+              package import the generated *_A types by name, javac cannot resolve those imports on
+              round one and gives up before any processing round runs. Pass 1 processes the model
+              package alone, where nothing references a generated type; pass 2 compiles the rest with
+              processing off, by which point the imports resolve.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.ver}</version>
+                <executions>
+                    <execution>
+                        <id>generate-arcade-accessors</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <proc>only</proc>
+                            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+                            <includes>
+                                <include>chatsgate/whatsappfx/core/model/*.java</include>
+                            </includes>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>io.github.datapotter</groupId>
+                                    <artifactId>datapotter-arcadedbhelper-processor</artifactId>
+                                    <version>${datahelper.processor.ver}</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <proc>none</proc>
+                            <!-- Aimed at a directory it will never fill: the plugin clears this before
+                                 compiling, and on the default value that is pass 1's output. -->
+                            <generatedSourcesDirectory>${project.build.directory}/generated-sources/unused-second-pass</generatedSourcesDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

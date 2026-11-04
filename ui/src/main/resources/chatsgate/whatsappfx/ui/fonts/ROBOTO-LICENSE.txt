@@ -1,0 +1,3 @@
+Roboto (Regular and Bold, hinted static files from Roboto 3 Classic v3.016)
+Source: https://github.com/googlefonts/roboto-3-classic
+Licence: Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0). The font files are unchanged.

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.chatsgate</groupId>
+        <artifactId>whatsappfx-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+
+    <artifactId>whatsappfx-cli</artifactId>
+    <packaging>jar</packaging>
+
+    <description>whatsappcli: the agent-facing command line. Thin by construction — it depends on
+        wire and picocli only, so no ArcadeDB or connector code lands in its shaded jar.</description>
+
+    <properties>
+        <main.class>chatsgate.whatsappfx.cli.WaCli</main.class>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.chatsgate</groupId>
+            <artifactId>whatsappfx-wire</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>${picocli.ver}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>whatsappcli</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${main.class}</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- The cmdtools launcher(s), built by jr-maven-plugin with the config baked in (replaces the .jrc):
+         mvn -Djrexe -Djr.installDir=<folder on PATH> package -->
+    <profiles>
+        <profile>
+            <id>jrexe</id>
+            <activation>
+                <property>
+                    <name>jrexe</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.jarrunner</groupId>
+                        <artifactId>jr-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>whatsappcli</id>
+                                <goals><goal>exe</goal></goals>
+                                <configuration>
+                                    <name>whatsappcli</name>
+                                    <jar>${wa.cli.jar}</jar>
+                                    <jvmMode>dll</jvmMode>
+                                    <aot>true</aot>
+                                    <vmArgs><vmArg>-Xms8m</vmArg><vmArg>-Xmx64m</vmArg><vmArg>-Xss512k</vmArg><vmArg>-XX:+UseSerialGC</vmArg><vmArg>-XX:TieredStopAtLevel=1</vmArg><vmArg>-XX:ReservedCodeCacheSize=24m</vmArg><vmArg>--enable-native-access=ALL-UNNAMED</vmArg></vmArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

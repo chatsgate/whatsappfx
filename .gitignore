@@ -1,0 +1,14 @@
+# work notes, never published
+prp/
+CLAUDE.md
+.claude/
+
+# build output
+target/
+node_modules/
+*.class
+connector/wa-connector.exe
+connector/wa-connector-darwin-*
+
+# runtime logs (ArcadeDB writes log/ into the working directory)
+log/

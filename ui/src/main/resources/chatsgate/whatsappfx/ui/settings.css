@@ -1,0 +1,27 @@
+/* Settings: WhatsApp's own shape (sections on the left, one at a time on the right), in the chat window's dark palette
+   (the -wa-* names are defined in chat/chat.css). Sizes are measured off the recorded WhatsApp Settings pages. */
+.settings-root { -fx-background-color: -wa-chat; }
+.settings-sidebox { -fx-background-color: -wa-side; -fx-border-color: transparent -wa-line transparent transparent; }
+.settings-title { -fx-text-fill: -wa-text; -fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 22 24 14 24; }
+.settings-side { -fx-padding: 0 8 0 8; -fx-spacing: 2; }
+.side-item { -fx-padding: 12 16 12 16; -fx-background-radius: 10; -fx-cursor: hand; }
+.side-item:hover { -fx-background-color: -wa-hover; }
+.side-item.selected { -fx-background-color: -wa-select; }
+.side-title { -fx-text-fill: -wa-text; -fx-font-size: 16px; }
+.side-sub { -fx-text-fill: -wa-muted; -fx-font-size: 13px; }
+
+.settings-scroll, .settings-scroll > .viewport { -fx-background-color: transparent; -fx-background: transparent; }
+.settings-content { -fx-padding: 22 40 22 40; -fx-spacing: 0; }
+.content-title { -fx-text-fill: -wa-text; -fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 0 0 18 0; }
+.row { -fx-padding: 14 0 14 0; -fx-border-color: transparent transparent -wa-line transparent; }
+.row-title { -fx-text-fill: -wa-text; -fx-font-size: 16px; }
+.row-sub { -fx-text-fill: -wa-muted; -fx-font-size: 13.5px; }
+.row-sub-warn { -fx-text-fill: -wa-warn-text; -fx-font-size: 13.5px; }
+
+.switch { -fx-background-radius: 12; -fx-cursor: hand; }
+.switch.on { -fx-background-color: -wa-accent; }
+.switch.off { -fx-background-color: #5d6b72; }
+.switch .knob { -fx-fill: #111b21; }
+
+.settings-foot { -fx-padding: 8 40 14 40; -fx-border-color: -wa-line transparent transparent transparent; }
+.settings-said { -fx-text-fill: -wa-warn-text; -fx-font-size: 13px; }

@@ -1,0 +1,27 @@
+/* Notification cards: plain opaque rectangles (a transparent window renders as a white box on Windows, and macOS differs again). The colours come from the number's colour, set on each card in Card.java; these are the fallbacks. */
+.card {
+    -fx-background-color: #1f2c33;
+    -fx-border-color: #2a3942;
+    -fx-padding: 10 12 12 12;
+    -fx-pref-width: 380;
+}
+.app { -fx-text-fill: #8696a0; -fx-font-size: 11; }
+.close { -fx-background-color: transparent; -fx-text-fill: #8696a0; -fx-padding: 0 4; -fx-cursor: hand; }
+.close:hover { -fx-text-fill: #e9edef; }
+.title { -fx-text-fill: #e9edef; -fx-font-size: 14; -fx-font-weight: bold; }
+.text { -fx-text-fill: #d1d7db; -fx-font-size: 13; }
+.status { -fx-text-fill: #8696a0; -fx-font-size: 11; }
+.locked { -fx-text-fill: #f0b429; -fx-font-size: 12; }
+.reply {
+    -fx-background-color: rgba(0,0,0,0.32); -fx-background-radius: 3; -fx-text-fill: #e9edef;
+    -fx-prompt-text-fill: #8696a0; -fx-font-size: 13; -fx-padding: 6 10;
+}
+.chip { -fx-background-radius: 6; -fx-font-size: 11; -fx-padding: 4 9; -fx-cursor: hand; }
+.chip.green { -fx-background-color: rgba(26,163,122,0.25); -fx-text-fill: #7fe0c0; }
+.chip.green:hover { -fx-background-color: rgba(26,163,122,0.45); }
+.chip.red { -fx-background-color: rgba(234,0,56,0.25); -fx-text-fill: #ff8fa6; }
+.chip.red:hover { -fx-background-color: rgba(234,0,56,0.45); }
+.chip.blue { -fx-background-color: rgba(83,189,235,0.22); -fx-text-fill: #9fdcf6; }
+.chip.blue:hover { -fx-background-color: rgba(83,189,235,0.42); }
+.chip.grey { -fx-background-color: rgba(134,150,160,0.22); -fx-text-fill: #c0cbd1; }
+.chip.grey:hover { -fx-background-color: rgba(134,150,160,0.42); }

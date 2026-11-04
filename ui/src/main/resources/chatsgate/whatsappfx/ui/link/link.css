@@ -1,0 +1,19 @@
+/* The look of WhatsApp's own login screen: cream page, one white rounded card, green only where it means "go". */
+.link-root { -link-accent: #25D366; -link-ink: #1DAA61; -fx-background-color: #FCF5EB; -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+.brand-name { -fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: -link-ink; }
+.link-card { -fx-background-color: white; -fx-background-radius: 25; -fx-border-color: #000000; -fx-border-radius: 25; -fx-border-width: 1; -fx-padding: 48 48 28 48; }
+.link-title { -fx-font-size: 32px; -fx-text-fill: #1D1F1F; }
+.step-number { -fx-min-width: 26; -fx-min-height: 26; -fx-max-width: 26; -fx-max-height: 26; -fx-alignment: center; -fx-border-color: #000000; -fx-border-radius: 13; -fx-background-radius: 13; -fx-background-color: white; -fx-font-size: 14px; -fx-text-fill: #000000; }
+.step-line { -fx-background-color: #000000; -fx-min-width: 1; -fx-max-width: 1; }
+.step-text { -fx-font-size: 18px; -fx-text-fill: #111B21; }
+.qr-box { -fx-background-color: #F4F4F4; -fx-background-radius: 16; -fx-min-width: 230; -fx-min-height: 230; -fx-max-width: 230; -fx-max-height: 230; }
+.qr-note { -fx-font-size: 13px; -fx-text-fill: #5B6368; -fx-wrap-text: true; -fx-text-alignment: center; }
+.phone-field { -fx-font-size: 20px; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #BBC5CB; -fx-padding: 10 14 10 14; }
+.phone-field:focused { -fx-border-color: -link-ink; -fx-border-width: 2; }
+.code-text { -fx-font-family: "Consolas", monospace; -fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #0A0A0A; -fx-background-color: #F4F4F4; -fx-background-radius: 16; -fx-padding: 18 26 18 26; }
+.alt-link { -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0A0A0A; -fx-border-color: transparent transparent -link-accent transparent; -fx-border-width: 0 0 2 0; -fx-cursor: hand; }
+.hint { -fx-font-size: 13px; -fx-text-fill: #5B6368; -fx-wrap-text: true; }
+.said { -fx-font-size: 14px; -fx-text-fill: #0A0A0A; -fx-wrap-text: true; }
+.notice { -fx-font-size: 12px; -fx-text-fill: #5B6368; }
+.go-button { -fx-background-color: -link-accent; -fx-background-radius: 26; -fx-border-color: #1D1F1F; -fx-border-radius: 26; -fx-text-fill: #1D1F1F; -fx-font-size: 16px; -fx-font-weight: 500; -fx-padding: 10 24 10 24; -fx-cursor: hand; }
+.phone-field:focused { -fx-prompt-text-fill: #8D9599; }
