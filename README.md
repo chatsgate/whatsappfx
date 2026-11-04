@@ -110,7 +110,7 @@ WhatsApp does not allow unofficial clients and can restrict or ban numbers that 
 
 ## Get it
 
-**Windows.** Build it (JDK 25, Go 1.26+): `mvn install` for the app and `cd connector && go build -o wa-connector.exe .`; copy the connector to `%USERPROFILE%\chatsgate\whatsappfx\bin\`, then `java --enable-native-access=ALL-UNNAMED -jar ui\target\whatsappfx.jar`. A ready-to-run archive will be attached to a release.
+**Windows.** Install Java 25 (a JDK from [adoptium.net](https://adoptium.net)), download `whatsappfx-windows.zip` from the [Releases](../../releases) page, unpack it and run `whatsappfx.cmd`. The first run puts the connector next to your data and opens a window with a QR code; scan it from the phone (WhatsApp, Settings, Linked devices, Link a device). `whatsappcli.cmd` is the command line. To build it yourself: `mvn install` and `cd connector && go build -o wa-connector.exe .` (JDK 25, Go 1.26+).
 
 **macOS (Apple silicon).** From the [Releases](../../releases) page download `whatsappfx-mac.tar.gz` and, in Terminal, with Java 25 installed (a JDK from [adoptium.net](https://adoptium.net) is fine):
 
@@ -118,6 +118,11 @@ WhatsApp does not allow unofficial clients and can restrict or ban numbers that 
     ~/.local/bin/whatsappfx --background
 
 Download with `curl -fLO`, not a browser, so macOS does not put its quarantine flag on the files. The F-keys are media keys on a Mac laptop: hold **Fn**, or tick "Use F1, F2, etc. keys as standard function keys" in System Settings, Keyboard.
+
+<p align="center">
+  <img src="docs/screenshots/mac-ci.png" width="80%" alt="WhatsappFx on a macOS CI runner: the number chooser, a QR window and a notification card. The menu bar still says java.">
+</p>
+<p align="center"><i>On a macOS CI runner. Note the menu bar still says "java".</i></p>
 
 > **Mac testing is poor, and we say so.** The Mac build has been tested on a CI runner (GitHub's Apple-silicon machines: it starts, the windows open, the command line is identified, two numbers run, screenshots are taken) and then **once on one person's real MacBook, where it did not go smoothly**: it is not a proper Mac app yet (it appears as "java" in the Dock and menu bar, there is no `.app` bundle, it needs Java installed by hand), windows may open behind others or on another desktop until you click its Dock icon, and it is not signed or notarised. Treat the Mac version as a preview, expect rough edges, and please open an issue with what you see. A real `.app` is next.
 
