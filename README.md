@@ -123,14 +123,14 @@ WhatsApp does not allow unofficial clients and can restrict or ban numbers that 
 
 ## Get it
 
-**Windows.** Install Java 25 (a JDK from [adoptium.net](https://adoptium.net)), download `whatsappfx-windows.zip` from the [Releases](../../releases) page, unpack it and run `whatsappfx.cmd`. The first run puts the connector next to your data and opens a window with a QR code; scan it from the phone (WhatsApp, Settings, Linked devices, Link a device). `whatsappcli.cmd` is the command line. To build it yourself: `mvn install` and `cd connector && go build -o wa-connector.exe .` (JDK 25, Go 1.26+).
+**Windows.** Install Java 25 (a JDK from [adoptium.net](https://adoptium.net)), download `whatsappfx-windows.zip` from the [Releases](../../releases) page, unpack it and run `whatsappfx.cmd`. The first run puts the connector next to your data and opens a window with a QR code; scan it from the phone (WhatsApp, Settings, Linked devices, Link a device). `whatsappcli.cmd` is the command line; it is part of the same zip and the same build, and it only works while the app is running (with the app closed it answers "WhatsappFx is not running", so start `whatsappfx.cmd` first). Put the unpacked folder on your `PATH` to type `whatsappcli` from anywhere. To build it yourself: `mvn install` and `cd connector && go build -o wa-connector.exe .` (JDK 25, Go 1.26+).
 
 **macOS (Apple silicon).** From the [Releases](../../releases) page download `whatsappfx-mac.tar.gz` and, in Terminal, with Java 25 installed (a JDK from [adoptium.net](https://adoptium.net) is fine):
 
     tar -xzf whatsappfx-mac.tar.gz && sh whatsappfx-mac/install.sh
     ~/.local/bin/whatsappfx --background
 
-Download with `curl -fLO`, not a browser, so macOS does not put its quarantine flag on the files. The F-keys are media keys on a Mac laptop: hold **Fn**, or tick "Use F1, F2, etc. keys as standard function keys" in System Settings, Keyboard.
+This installs both `whatsappfx` and `whatsappcli` into `~/.local/bin`; the command line only works while the app is running (start `whatsappfx` first). Download with `curl -fLO`, not a browser, so macOS does not put its quarantine flag on the files. The F-keys are media keys on a Mac laptop: hold **Fn**, or tick "Use F1, F2, etc. keys as standard function keys" in System Settings, Keyboard.
 
 <p align="center">
   <img src="docs/screenshots/mac-ci.png" width="80%" alt="WhatsappFx on a macOS CI runner: the number chooser, a QR window and a notification card. The menu bar still says java.">
