@@ -248,7 +248,7 @@ public final class SettingsWindow {
     }
 
     void about(List<Node> rows, List<Act> acts) {
-        rows.add(row("WhatsappFx 1.0", "An opensource alternative to WhatsApp. It is an unofficial client and is not affiliated with WhatsApp.", null, false));
+        rows.add(row("WhatsappFx " + chatsgate.whatsappfx.wire.Version.current(), "An opensource alternative to WhatsApp. It is an unofficial client and is not affiliated with WhatsApp.", null, false));
         rows.add(row("Data", chatsgate.whatsappfx.wire.Paths2.home().toString(), null, false));
         rows.add(row("Licences", "The app is Apache-2.0; the connector is GPL-3.0 because it links the Signal protocol library.", null, false));
         acts.add(new Act(KeyCode.F8, "Copy state", this::copy));

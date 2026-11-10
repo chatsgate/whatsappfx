@@ -20,7 +20,7 @@ import java.time.Instant;
  */
 public final class DaemonMain {
 
-    public static final String VERSION = "1.0";
+    public static final String VERSION = chatsgate.whatsappfx.wire.Version.current();
 
     public static void main(String[] args) throws Exception {
         Log.echo = true;

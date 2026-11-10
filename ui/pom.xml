@@ -139,6 +139,7 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>chatsgate.whatsappfx.ui.Launcher</mainClass>
+                                    <manifestEntries><Implementation-Version>${jrexe.version}</Implementation-Version></manifestEntries>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -151,6 +152,26 @@
     <!-- The cmdtools launcher(s), built by jr-maven-plugin with the config baked in (replaces the .jrc):
          mvn -Djrexe -Djr.installDir=<folder on PATH> package -->
     <profiles>
+        <!-- A release jar carries the Windows connector (built from connector/ by release.ps1: go build -o connector/wa-connector.exe), so the exe that fetched
+             the jar needs no zip: core.ConnectorProvision copies it into the data folder at start. Opt-in, so a build folder never ships a stale connector. -->
+        <profile>
+            <id>embed-connector</id>
+            <activation>
+                <property>
+                    <name>embedConnector</name>
+                </property>
+            </activation>
+            <build>
+                <resources>
+                    <resource><directory>${project.basedir}/src/main/resources</directory></resource>
+                    <resource>
+                        <directory>${project.basedir}/../connector</directory>
+                        <includes><include>wa-connector.exe</include></includes>
+                        <targetPath>connector</targetPath>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
         <profile>
             <id>jrexe</id>
             <activation>
@@ -171,6 +192,16 @@
                                 <configuration>
                                     <name>whatsappfx</name>
                                     <jar>${wa.ui.jar}</jar>
+                                    <appVersion>${jrexe.version}</appVersion>
+                                    <jarUrl>${jrexe.release}/whatsappfx-{sha8}.jar</jarUrl>
+                                    <updateUrl>${jrexe.updates}/whatsappfx.json</updateUrl>
+                                    <updateChannel>${jrexe.channel}</updateChannel>
+                                    <appId>io.github.chatsgate:whatsappfx</appId>
+                                    <fileDescription>WhatsappFx</fileDescription>
+                                    <productName>WhatsappFx</productName>
+                                    <companyName>chatsgate</companyName>
+                                    <copyright>chatsgate contributors</copyright>
+                                    <javaVersion>25+</javaVersion>
                                     <jvmMode>dll</jvmMode>
                                     <aot>true</aot>
                                     <icon>${project.basedir}/src/main/jr/whatsappfx.ico</icon>

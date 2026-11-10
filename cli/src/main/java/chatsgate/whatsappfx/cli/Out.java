@@ -24,9 +24,22 @@ public final class Out {
 
     private Out() {}
 
+    private static boolean warnedBuild;
+
     public static DaemonClient daemon() {
-        return DaemonClient.ifRunning().orElseThrow(() -> new IllegalStateException(
-                "WhatsappFx is not running — start the app first (it holds the index and the WhatsApp session)"));
+        var d = DaemonClient.ifRunning().orElseThrow(() -> new IllegalStateException(
+                "WhatsappFx is not running — start the app first (run whatsappfx; it holds the index and the WhatsApp session, and this command line only talks to it)"));
+        warnIfOtherBuild(d.version());
+        return d;
+    }
+
+    /** The command line and the app are one release; a different build on the other end is said once, on stderr. */
+    private static void warnIfOtherBuild(String app) {
+        var mine = chatsgate.whatsappfx.wire.Version.current();
+        if (warnedBuild || app == null || app.equals(mine) || app.equals("dev") || mine.equals("dev")) return;
+        warnedBuild = true;
+        STDERR.println("note: whatsappcli " + mine + " is talking to a WhatsappFx " + app + ". They are meant to be the same build:"
+                + " update both (whatsappfx -Xjr:update, whatsappcli -Xjr:update).");
     }
 
     public static String call(String verb, Map<String, Object> args) throws Exception {

@@ -60,6 +60,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>${main.class}</mainClass>
+                                    <manifestEntries><Implementation-Version>${jrexe.version}</Implementation-Version></manifestEntries>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -92,6 +93,16 @@
                                 <configuration>
                                     <name>whatsappcli</name>
                                     <jar>${wa.cli.jar}</jar>
+                                <appVersion>${jrexe.version}</appVersion>
+                                <jarUrl>${jrexe.release}/whatsappcli-{sha8}.jar</jarUrl>
+                                <updateUrl>${jrexe.updates}/whatsappcli.json</updateUrl>
+                                <updateChannel>${jrexe.channel}</updateChannel>
+                                <appId>io.github.chatsgate:whatsappcli</appId>
+                                <fileDescription>whatsappcli: the command line of WhatsappFx</fileDescription>
+                                <productName>WhatsappFx</productName>
+                                <companyName>chatsgate</companyName>
+                                <copyright>chatsgate contributors</copyright>
+                                <javaVersion>25+</javaVersion>
                                     <jvmMode>dll</jvmMode>
                                     <aot>true</aot>
                                     <vmArgs><vmArg>-Xms8m</vmArg><vmArg>-Xmx64m</vmArg><vmArg>-Xss512k</vmArg><vmArg>-XX:+UseSerialGC</vmArg><vmArg>-XX:TieredStopAtLevel=1</vmArg><vmArg>-XX:ReservedCodeCacheSize=24m</vmArg><vmArg>--enable-native-access=ALL-UNNAMED</vmArg></vmArgs>

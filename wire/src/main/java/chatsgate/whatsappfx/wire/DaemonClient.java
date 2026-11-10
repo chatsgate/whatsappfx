@@ -57,6 +57,11 @@ public final class DaemonClient {
         }
     }
 
+    /** The build of the running app, as it wrote it into daemon.json. */
+    public String version() {
+        return handshake.version();
+    }
+
     public int port() {
         return handshake.port();
     }

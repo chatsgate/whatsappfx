@@ -22,11 +22,13 @@ public final class Launcher {
                 return;
             }
             if (a.equals("--version") || a.equals("-V")) {
-                System.out.println("WhatsappFx 1.0");
+                System.out.println("WhatsappFx " + chatsgate.whatsappfx.wire.Version.current());
                 return;
             }
         }
         if (showRunning(args)) return;
+        // a release jar carries its connector: put it where the app looks (nothing to do for a build folder)
+        chatsgate.whatsappfx.core.ConnectorProvision.ensure();
         // the menu bar and the Dock name the app after this; without it a jar run says "java"
         if (chatsgate.whatsappfx.wire.Os.MAC) System.setProperty("apple.awt.application.name", "WhatsappFx");
         App.main(args);

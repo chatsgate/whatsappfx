@@ -33,6 +33,15 @@
         <jackson.ver>2.21.2</jackson.ver>
         <javafx.ver>25.0.2</javafx.ver>
 
+        <!-- The release the jr launchers belong to. release.ps1 passes -Djrexe.version=0.2.0-beta.1; a plain build is 1.0.
+             It is the exe's own version, the Implementation-Version of both shaded jars (so the app and the command line
+             can tell they are one build) and the release the exes fetch their jar from. -->
+        <jrexe.version>${project.version}</jrexe.version>
+        <jrexe.channel>stable</jrexe.channel>
+        <jrexe.release>https://github.com/chatsgate/whatsappfx/releases/download/v${jrexe.version}</jrexe.release>
+        <!-- the update files, one per exe, written by release.ps1 into update/ of this repository and read from here -->
+        <jrexe.updates>https://raw.githubusercontent.com/chatsgate/whatsappfx/main/update</jrexe.updates>
+
         <compiler.plugin.ver>3.13.0</compiler.plugin.ver>
         <shade.plugin.ver>3.5.1</shade.plugin.ver>
     </properties>

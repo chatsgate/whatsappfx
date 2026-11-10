@@ -22,7 +22,7 @@ import static chatsgate.whatsappfx.cli.Out.emit;
  * <p>Every listing prints TSV by default and JSON on request, so a result pipes into a spreadsheet
  * or into another tool without an intermediate parser.
  */
-@Command(name = "whatsappcli", mixinStandardHelpOptions = true, version = "1.0",
+@Command(name = "whatsappcli", mixinStandardHelpOptions = true, versionProvider = WaCli.Ver.class,
         usageHelpWidth = 100,
         header = {
                 "Read and act on WhatsApp through the running WhatsappFx app.",
@@ -170,6 +170,11 @@ import static chatsgate.whatsappfx.cli.Out.emit;
         },
         subcommands = CommandLine.HelpCommand.class)
 public final class WaCli {
+
+    /** The version shown by --version: the release this jar was built as (see wire.Version). */
+    public static final class Ver implements CommandLine.IVersionProvider {
+        @Override public String[] getVersion() { return new String[] {"whatsappcli " + chatsgate.whatsappfx.wire.Version.current()}; }
+    }
 
     @Option(names = "--json", scope = CommandLine.ScopeType.INHERIT, description = "JSON instead of TSV")
     boolean json;
