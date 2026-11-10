@@ -1,0 +1,17 @@
+{
+  "format" : 1,
+  "app" : "io.github.chatsgate:whatsappcli",
+  "channels" : {
+    "beta" : "0.2.0-beta.1"
+  },
+  "releases" : [ {
+    "version" : "0.2.0-beta.1",
+    "released" : "2026-11-10T23:07:57Z",
+    "exe" : {
+      "windows-x86_64" : {
+        "sha256" : "1387221f761751c3ca752704f19bb3147005876bf04b0aab6ad5a3622184a6a3",
+        "urls" : [ "https://github.com/chatsgate/whatsappfx/releases/download/v0.2.0-beta.1/whatsappcli.exe" ]
+      }
+    }
+  } ]
+}

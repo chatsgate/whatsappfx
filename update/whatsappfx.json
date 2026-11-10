@@ -1,0 +1,17 @@
+{
+  "format" : 1,
+  "app" : "io.github.chatsgate:whatsappfx",
+  "channels" : {
+    "beta" : "0.2.0-beta.1"
+  },
+  "releases" : [ {
+    "version" : "0.2.0-beta.1",
+    "released" : "2026-11-10T23:07:48Z",
+    "exe" : {
+      "windows-x86_64" : {
+        "sha256" : "b4790e068af2093f3feaab0ec079987a2694190e9d9ee00fe92a503eddc36066",
+        "urls" : [ "https://github.com/chatsgate/whatsappfx/releases/download/v0.2.0-beta.1/whatsappfx.exe" ]
+      }
+    }
+  } ]
+}

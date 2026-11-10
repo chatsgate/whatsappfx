@@ -123,9 +123,18 @@ WhatsApp does not allow unofficial clients and can restrict or ban numbers that 
 
 ## Get it
 
-**Windows.** Install Java 25 (a JDK from [adoptium.net](https://adoptium.net)), download `whatsappfx-windows.zip` from the [Releases](../../releases) page, unpack it and run `whatsappfx.cmd`. The first run puts the connector next to your data and opens a window with a QR code; scan it from the phone (WhatsApp, Settings, Linked devices, Link a device). `whatsappcli.cmd` is the command line; it is part of the same zip and the same build, and it only works while the app is running (with the app closed it answers "WhatsappFx is not running", so start `whatsappfx.cmd` first). Put the unpacked folder on your `PATH` to type `whatsappcli` from anywhere. To build it yourself: `mvn install` and `cd connector && go build -o wa-connector.exe .` (JDK 25, Go 1.26+).
+**Windows.** Two small programs, `whatsappfx.exe` (the app) and `whatsappcli.exe` (the command line for agents), one file each, no installer, no zip. In PowerShell (`curl.exe` ships with Windows 10 and 11):
 
-**macOS (Apple silicon).** From the [Releases](../../releases) page download `whatsappfx-mac.tar.gz` and, in Terminal, with Java 25 installed (a JDK from [adoptium.net](https://adoptium.net) is fine):
+    mkdir $env:LOCALAPPDATA\Programs\whatsappfx -Force; cd $env:LOCALAPPDATA\Programs\whatsappfx
+    curl.exe -fLO https://github.com/chatsgate/whatsappfx/releases/download/v0.2.0-beta.1/whatsappfx.exe
+    curl.exe -fLO https://github.com/chatsgate/whatsappfx/releases/download/v0.2.0-beta.1/whatsappcli.exe
+    .\whatsappfx.exe
+
+The first run of each fetches its program from the release and checks it against the SHA-256 baked into the exe, and, if the PC has no Java 25, offers to download one (a Temurin JDK, into your own profile, no administrator rights). The app opens a window with a QR code; scan it from the phone (WhatsApp, Settings, Linked devices, Link a device). The connector that speaks WhatsApp travels inside the app and is put next to your data by itself. `whatsappcli.exe` only works while the app is running (with the app closed it answers "WhatsappFx is not running", so start `whatsappfx.exe` first); the two are one build, and the command line says so if it ever meets an app of another build. Put that folder on your `PATH` (`[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path','User') + ';' + "$env:LOCALAPPDATAProgramswhatsappfx", 'User')`, then open a new terminal) to type `whatsappfx` and `whatsappcli` from anywhere, and run `whatsappcli autostart --set on` (it finds `whatsappfx` on the `PATH`) so the app starts at logon (leave it running: a PC that stays off for about two weeks is unlinked by WhatsApp).
+
+Update both with `whatsappfx -Xjr:update` and `whatsappcli -Xjr:update` (`-Xjr:update-check` only asks). The release is a **preview**, so the exes follow the `beta` channel of the update files in [`update/`](update). Each release page lists the SHA-256 of every file in `SHA256SUMS`. To build it yourself: `mvn install` and `cd connector && go build -o wa-connector.exe .` (JDK 25, Go 1.26+); `release.ps1` is how the release is made.
+
+**macOS (Apple silicon).** The Mac is not on the launchers yet. From the [v0.1.0 release](https://github.com/chatsgate/whatsappfx/releases/tag/v0.1.0) download `whatsappfx-mac.tar.gz` and, in Terminal, with Java 25 installed (a JDK from [adoptium.net](https://adoptium.net) is fine):
 
     tar -xzf whatsappfx-mac.tar.gz && sh whatsappfx-mac/install.sh
     ~/.local/bin/whatsappfx --background
